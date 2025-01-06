@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 08:12:53 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/06 15:53:29 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/06 16:54:23 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,33 +93,31 @@ void *ft_philo_routine(void *arg)
 
     while (1)
     {
-        printf("Philosophe %d réfléchit\n", philo->id);
-
         // Prise des fourchettes (avec ordre alterné)
         if (philo->id % 2 == 0)
         {
             pthread_mutex_lock(philo->right_fork);
-            printf("Philosophe %d a pris sa fourchette droite\n", philo->id);
+            printf("%d has taken a fork\n", philo->id);
             pthread_mutex_lock(philo->left_fork);
-            printf("Philosophe %d a pris sa fourchette gauche\n", philo->id);
+            printf("%d has taken a fork\n", philo->id);
         }
         else
         {
             pthread_mutex_lock(philo->left_fork);
-            printf("Philosophe %d a pris sa fourchette gauche\n", philo->id);
+            printf("%d has taken a fork\n", philo->id);
             pthread_mutex_lock(philo->right_fork);
-            printf("Philosophe %d a pris sa fourchette droite\n", philo->id);
+            printf("%d has taken a fork\n", philo->id);
         }
 
-        if (philo->last_meal_time - philo->table->time_to_die >= philo->table->time_to_die)
+        if (philo->last_meal_time - philo->table->time_to_eat >= philo->table->time_to_die)
         {
-            printf("Mort du philo %d\n", philo->id);
+            printf("%d died\n", philo->id);
             pthread_mutex_unlock(philo->right_fork);
             pthread_mutex_unlock(philo->left_fork);
             break ;
         }
         // Manger
-        printf("Philosophe %d mange\n", philo->id);
+        printf("%d is eating\n", philo->id);
         philo->last_meal_time = ft_get_time();
         philo->meals_eaten++;
         usleep(philo->table->time_to_eat * 1000);
@@ -129,8 +127,11 @@ void *ft_philo_routine(void *arg)
         pthread_mutex_unlock(philo->left_fork);
 
         // Dormir
-        printf("Philosophe %d dort\n", philo->id);
+        printf("%d is sleeping\n", philo->id);
         usleep(philo->table->time_to_sleep * 1000);
+
+        printf("%d is thinking\n", philo->id);
+
     }
 
     return NULL;
