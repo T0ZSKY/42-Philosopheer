@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 08:12:53 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/06 11:33:18 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/06 15:40:32 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,25 +38,38 @@ int ft_init_philo(t_table *table, int nb, char **argv)
 
     table->forks = malloc(sizeof(pthread_mutex_t) * nb);
     if (!table->forks)
+    {
+        perror("Erreur d'allocation pour les fourchettes");
         return (-1);
+    }
     while (i < nb)
     {
-        pthread_mutex_init(&table->forks[i], NULL);
+        if (pthread_mutex_init(&table->forks[i], NULL) != 0)
+        {
+            perror("Erreur d'initialisation de mutex pour une fourchette");
+            return (-1);
+        }
         i++;
     }
 
     table->philos = malloc(sizeof(t_philosopher) * nb);
     if (!table->philos)
+    {
+        perror("Erreur d'allocation pour les philosophes");
+        free(table->forks);
         return (-1);
+    }
 
     i = 0;
     while (i < nb)
     {
-        table->philos[i].id = i + 1;  // IDs de 1 à nb
+        table->philos[i].id = i + 1;
         table->philos[i].meals_eaten = 0;
         table->philos[i].last_meal_time = 0;
         table->philos[i].left_fork = &table->forks[i];
         table->philos[i].right_fork = &table->forks[(i + 1) % nb];
+        table->philos[i].table = table;
+        table->philos[i].is_dead = 0;
         i++;
     }
     return (0);
@@ -68,9 +81,7 @@ long long ft_get_time(void)
     long long milliseconds;
 
     gettimeofday(&tv, NULL);
-
     milliseconds = (tv.tv_sec * 1000LL) + (tv.tv_usec / 1000);
-
     return milliseconds;
 }
 
@@ -78,9 +89,8 @@ void *ft_philo_routine(void *arg)
 {
     t_philosopher *philo = (t_philosopher *)arg;
 
-    // Délai initial pour éviter les conflits
     if (philo->id % 2 == 0)
-        usleep(100 * 1000);
+        usleep(100);
 
     while (1)
     {
@@ -129,8 +139,8 @@ void ft_init_thread(t_table *table)
     {
         if (pthread_create(&table->philos[i].thread, NULL, ft_philo_routine, &table->philos[i]) != 0)
         {
-            printf("Erreur thread creation pour le philosophe %d\n", i + 1);
-            // Libération des ressources allouées
+            printf("Erreur création thread pour le philosophe %d\n", i + 1);
+            // Libérer les ressources allouées
             while (i > 0)
             {
                 pthread_cancel(table->philos[--i].thread);
@@ -141,11 +151,17 @@ void ft_init_thread(t_table *table)
     }
 }
 
+void ft_check_death()
+{
+    
+}
+
 int main(int argc, char **argv)
 {
     t_table table;
+    pthread_t death_thread;
 
-    if (argc < 4)
+    if (argc < 5)
     {
         write(1, "error argument\n", 16);
         return (-1);
@@ -161,9 +177,8 @@ int main(int argc, char **argv)
         return (-1);
     }
     ft_init_thread(&table);
-
-
-
+    pthread_create(&death_thread, NULL, ft_check_death, &table);
     ft_cleanup(&table);
+
     return (0);
 }
