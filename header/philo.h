@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:07:18 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/06 15:34:10 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/06 15:49:52 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ typedef struct s_philosopher
     pthread_mutex_t *left_fork;
     pthread_mutex_t *right_fork;
     t_table         *table;
-    int             is_dead;
     pthread_t       thread;
 }   t_philosopher;
 

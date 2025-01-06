@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 08:12:53 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/06 15:40:32 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/06 15:53:29 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,6 @@ int ft_init_philo(t_table *table, int nb, char **argv)
         table->philos[i].left_fork = &table->forks[i];
         table->philos[i].right_fork = &table->forks[(i + 1) % nb];
         table->philos[i].table = table;
-        table->philos[i].is_dead = 0;
         i++;
     }
     return (0);
@@ -112,6 +111,13 @@ void *ft_philo_routine(void *arg)
             printf("Philosophe %d a pris sa fourchette droite\n", philo->id);
         }
 
+        if (philo->last_meal_time - philo->table->time_to_die >= philo->table->time_to_die)
+        {
+            printf("Mort du philo %d\n", philo->id);
+            pthread_mutex_unlock(philo->right_fork);
+            pthread_mutex_unlock(philo->left_fork);
+            break ;
+        }
         // Manger
         printf("Philosophe %d mange\n", philo->id);
         philo->last_meal_time = ft_get_time();
@@ -151,15 +157,9 @@ void ft_init_thread(t_table *table)
     }
 }
 
-void ft_check_death()
-{
-    
-}
-
 int main(int argc, char **argv)
 {
     t_table table;
-    pthread_t death_thread;
 
     if (argc < 5)
     {
@@ -177,7 +177,6 @@ int main(int argc, char **argv)
         return (-1);
     }
     ft_init_thread(&table);
-    pthread_create(&death_thread, NULL, ft_check_death, &table);
     ft_cleanup(&table);
 
     return (0);
