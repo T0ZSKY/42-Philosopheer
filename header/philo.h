@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
+/*   By: tomlimon <tomlimon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:07:18 by tomlimon          #+#    #+#             */
-/*   Updated: 2024/12/22 17:14:42 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/06 10:37:45 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 # include <unistd.h>
 # include <sys/time.h>
 
+typedef struct s_table t_table;
+
 typedef struct s_philosopher
 {
     int             id;
@@ -26,6 +28,8 @@ typedef struct s_philosopher
     long long       last_meal_time;
     pthread_mutex_t *left_fork;
     pthread_mutex_t *right_fork;
+    t_table         *table;
+    pthread_t       thread;
 }   t_philosopher;
 
 typedef struct s_table

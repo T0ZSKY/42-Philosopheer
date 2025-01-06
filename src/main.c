@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
+/*   By: tomlimon <tomlimon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 08:12:53 by tomlimon          #+#    #+#             */
-/*   Updated: 2024/12/22 18:00:17 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/06 10:45:54 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,28 @@ int ft_init_philo(t_table *table, int nb, char **argv)
     return (0);
 }
 
+void ft_philo_routine()
+{
+    
+}
+
+void ft_init_thread(t_table *table)
+{
+    int i;
+
+    i = 0;
+    while (i < table->nb_philos)
+    {
+        if (pthread_create(&table->philo[i].thread, NULL, ft_philo_routine, &table->philo[i] != 0))
+        {
+            printf("Erreur thread creation");
+            return ;
+        }
+        pthread_detach(table->philo[i].thread);
+        i++;
+    }
+}
+
 int main(int argc, char **argv)
 {
     t_table table;
@@ -82,7 +104,7 @@ int main(int argc, char **argv)
         write(1, "initialization error\n", 22);
         return (-1);
     }
-
-	//wyp logic
+    ft_init_thread(&table);
+    
     return (0);
 }
