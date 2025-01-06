@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 08:12:53 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/06 11:13:44 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/06 11:33:18 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,35 +30,34 @@ int ft_init_philo(t_table *table, int nb, char **argv)
 {
     int i;
 
-	i = 0;
+    i = 0;
     table->nb_philos = nb;
     table->time_to_die = ft_atoi(argv[2]);
     table->time_to_eat = ft_atoi(argv[3]);
-	if (argv[4])
-		table->time_to_sleep = ft_atoi(argv[4]);
+    table->time_to_sleep = ft_atoi(argv[4]);
 
     table->forks = malloc(sizeof(pthread_mutex_t) * nb);
     if (!table->forks)
         return (-1);
     while (i < nb)
-	{
+    {
         pthread_mutex_init(&table->forks[i], NULL);
-		i++;
-	}
+        i++;
+    }
 
-    // Allouer les philosophes
     table->philos = malloc(sizeof(t_philosopher) * nb);
     if (!table->philos)
         return (-1);
-	i = 0;
+
+    i = 0;
     while (i < nb)
     {
-        table->philos[i].id = i + 1;
+        table->philos[i].id = i + 1;  // IDs de 1 à nb
         table->philos[i].meals_eaten = 0;
         table->philos[i].last_meal_time = 0;
         table->philos[i].left_fork = &table->forks[i];
         table->philos[i].right_fork = &table->forks[(i + 1) % nb];
-		i++;
+        i++;
     }
     return (0);
 }
@@ -68,10 +67,8 @@ long long ft_get_time(void)
     struct timeval tv;
     long long milliseconds;
 
-    // Récupérer l'heure actuelle
     gettimeofday(&tv, NULL);
 
-    // Convertir en millisecondes
     milliseconds = (tv.tv_sec * 1000LL) + (tv.tv_usec / 1000);
 
     return milliseconds;
@@ -81,17 +78,45 @@ void *ft_philo_routine(void *arg)
 {
     t_philosopher *philo = (t_philosopher *)arg;
 
-    if (!philo) // Vérifie que le pointeur n'est pas NULL
-    {
-        printf("Erreur : pointeur philosophe NULL\n");
-        return NULL;
-    }
+    // Délai initial pour éviter les conflits
+    if (philo->id % 2 == 0)
+        usleep(100 * 1000);
 
     while (1)
     {
-        printf("Philosophe %d est actif\n", philo->id);
-        usleep(500000); // Pause de 500 ms
+        printf("Philosophe %d réfléchit\n", philo->id);
+
+        // Prise des fourchettes (avec ordre alterné)
+        if (philo->id % 2 == 0)
+        {
+            pthread_mutex_lock(philo->right_fork);
+            printf("Philosophe %d a pris sa fourchette droite\n", philo->id);
+            pthread_mutex_lock(philo->left_fork);
+            printf("Philosophe %d a pris sa fourchette gauche\n", philo->id);
+        }
+        else
+        {
+            pthread_mutex_lock(philo->left_fork);
+            printf("Philosophe %d a pris sa fourchette gauche\n", philo->id);
+            pthread_mutex_lock(philo->right_fork);
+            printf("Philosophe %d a pris sa fourchette droite\n", philo->id);
+        }
+
+        // Manger
+        printf("Philosophe %d mange\n", philo->id);
+        philo->last_meal_time = ft_get_time();
+        philo->meals_eaten++;
+        usleep(philo->table->time_to_eat * 1000);
+
+        // Relâcher les fourchettes
+        pthread_mutex_unlock(philo->right_fork);
+        pthread_mutex_unlock(philo->left_fork);
+
+        // Dormir
+        printf("Philosophe %d dort\n", philo->id);
+        usleep(philo->table->time_to_sleep * 1000);
     }
+
     return NULL;
 }
 
@@ -105,6 +130,11 @@ void ft_init_thread(t_table *table)
         if (pthread_create(&table->philos[i].thread, NULL, ft_philo_routine, &table->philos[i]) != 0)
         {
             printf("Erreur thread creation pour le philosophe %d\n", i + 1);
+            // Libération des ressources allouées
+            while (i > 0)
+            {
+                pthread_cancel(table->philos[--i].thread);
+            }
             return;
         }
         i++;

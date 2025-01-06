@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:12:51 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/06 10:53:50 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/06 11:19:59 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,12 @@ void ft_cleanup(t_table *table)
 {
     int i;
 
-    i = 0;
+	i = 0;
     while (i < table->nb_philos)
     {
+        pthread_join(table->philos[i].thread, NULL);
         pthread_mutex_destroy(&table->forks[i]);
-        i++;
+		i++;
     }
     free(table->forks);
     free(table->philos);
