@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tomlimon <tomlimon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 08:12:53 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/06 10:45:54 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/06 11:13:44 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,9 +63,36 @@ int ft_init_philo(t_table *table, int nb, char **argv)
     return (0);
 }
 
-void ft_philo_routine()
+long long ft_get_time(void)
 {
-    
+    struct timeval tv;
+    long long milliseconds;
+
+    // Récupérer l'heure actuelle
+    gettimeofday(&tv, NULL);
+
+    // Convertir en millisecondes
+    milliseconds = (tv.tv_sec * 1000LL) + (tv.tv_usec / 1000);
+
+    return milliseconds;
+}
+
+void *ft_philo_routine(void *arg)
+{
+    t_philosopher *philo = (t_philosopher *)arg;
+
+    if (!philo) // Vérifie que le pointeur n'est pas NULL
+    {
+        printf("Erreur : pointeur philosophe NULL\n");
+        return NULL;
+    }
+
+    while (1)
+    {
+        printf("Philosophe %d est actif\n", philo->id);
+        usleep(500000); // Pause de 500 ms
+    }
+    return NULL;
 }
 
 void ft_init_thread(t_table *table)
@@ -75,12 +102,11 @@ void ft_init_thread(t_table *table)
     i = 0;
     while (i < table->nb_philos)
     {
-        if (pthread_create(&table->philo[i].thread, NULL, ft_philo_routine, &table->philo[i] != 0))
+        if (pthread_create(&table->philos[i].thread, NULL, ft_philo_routine, &table->philos[i]) != 0)
         {
-            printf("Erreur thread creation");
-            return ;
+            printf("Erreur thread creation pour le philosophe %d\n", i + 1);
+            return;
         }
-        pthread_detach(table->philo[i].thread);
         i++;
     }
 }
@@ -105,6 +131,9 @@ int main(int argc, char **argv)
         return (-1);
     }
     ft_init_thread(&table);
-    
+
+
+
+    ft_cleanup(&table);
     return (0);
 }

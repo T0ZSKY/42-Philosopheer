@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tomlimon <tomlimon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:07:18 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/06 10:37:45 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/06 10:54:01 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,5 +46,6 @@ typedef struct s_table
 ///declaration function
 
 int ft_atoi(char *str);
+void ft_cleanup(t_table *table);
 
 #endif

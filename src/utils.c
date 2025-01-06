@@ -6,9 +6,11 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:12:51 by tomlimon          #+#    #+#             */
-/*   Updated: 2024/12/22 17:14:24 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/06 10:53:50 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "../header/philo.h"
 
 int ft_atoi(char *str)
 {
@@ -31,4 +33,17 @@ int ft_atoi(char *str)
 		i++;
 	}
 	return (result * sign);
+}
+void ft_cleanup(t_table *table)
+{
+    int i;
+
+    i = 0;
+    while (i < table->nb_philos)
+    {
+        pthread_mutex_destroy(&table->forks[i]);
+        i++;
+    }
+    free(table->forks);
+    free(table->philos);
 }
