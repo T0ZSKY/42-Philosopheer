@@ -6,11 +6,11 @@
 #    By: tomlimon <tom.limon@>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/03 13:38:25 by tomlimon          #+#    #+#              #
-#    Updated: 2024/12/22 17:14:52 by tomlimon         ###   ########.fr        #
+#    Updated: 2025/01/07 10:14:05 by tomlimon         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = philosopher
+NAME = philo
 
 SRCS = ./src/main.c ./src/utils.c
 
