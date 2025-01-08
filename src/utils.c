@@ -6,34 +6,11 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:12:51 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/08 16:30:59 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/08 16:48:28 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../header/philo.h"
-
-void ft_smart_sleep(long long time, t_table *table)
-{
-    long long start;
-    long long now;
-
-    start = get_timestamp(table);
-    while (1)
-    {
-        pthread_mutex_lock(&table->status_mutex);
-        if (!table->simulation_running)
-        {
-            pthread_mutex_unlock(&table->status_mutex);
-            break;
-        }
-        pthread_mutex_unlock(&table->status_mutex);
-
-        now = get_timestamp(table);
-        if ((now - start) >= time)
-            break;
-        usleep(500);
-    }
-}
 
 int ft_atoi(char *str)
 {
@@ -77,15 +54,6 @@ void ft_cleanup(t_table *table)
     free(table->forks);
 }
 
-long long ft_get_time(void)
-{
-    struct timeval tv;
-    long long milliseconds;
-
-    gettimeofday(&tv, NULL);
-    milliseconds = (tv.tv_sec * 1000LL) + (tv.tv_usec / 1000);
-    return milliseconds;
-}
 void print_status(t_table *table, int philo_id, char *message)
 {
     pthread_mutex_lock(&table->write_mutex);
@@ -96,12 +64,7 @@ void print_status(t_table *table, int philo_id, char *message)
     pthread_mutex_unlock(&table->write_mutex);
 }
 
-long long get_timestamp(t_table *table)
-{
-    struct timeval current_time;
-    gettimeofday(&current_time, NULL);
-    return ((current_time.tv_sec * 1000 + current_time.tv_usec / 1000) - table->start_time);
-}
+
 int ft_strcmp(const char *s1, const char *s2)
 {
     size_t i;

@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 08:12:53 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/08 16:25:21 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/08 16:47:11 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ void *ft_supervisor(void *arg)
         {
             long long current_time = get_timestamp(table);
             long long time_since_last_meal = current_time -
-                                             (table->philos[i].last_meal_time - table->start_time);
+                                            (table->philos[i].last_meal_time - table->start_time);
 
             if (time_since_last_meal > table->time_to_die)
             {
@@ -134,7 +134,6 @@ void *ft_supervisor(void *arg)
                 meals_completed = 0;
         }
 
-        // Arrêter la simulation si tous les repas sont terminés
         if (table->max_meals != -1 && meals_completed)
         {
             pthread_mutex_lock(&table->status_mutex);
@@ -143,7 +142,7 @@ void *ft_supervisor(void *arg)
             return NULL;
         }
 
-        usleep(1000); // Vérification toutes les 1 ms
+        usleep(1000);
     }
 
     return NULL;
@@ -155,9 +154,8 @@ void *ft_philo_routine(void *arg)
     t_table *table = philo->table;
 
     if (philo->id % 2 == 0)
-        usleep(1000);  // Décalage pour les philosophes pairs
+        usleep(1000);
 
-    // Cas particulier pour un philosophe unique
     if (table->nb_philos == 1)
     {
         print_status(table, philo->id, "has taken a fork");
@@ -274,7 +272,6 @@ int main(int argc, char **argv)
 
     pthread_join(supervisor_thread, NULL);
 
-    // Attendre la fin de tous les threads des philosophes
     for (int i = 0; i < table.nb_philos; i++)
     {
         pthread_join(table.philos[i].thread, NULL);

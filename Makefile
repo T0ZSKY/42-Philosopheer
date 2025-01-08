@@ -6,13 +6,13 @@
 #    By: tomlimon <tom.limon@>                      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/03 13:38:25 by tomlimon          #+#    #+#              #
-#    Updated: 2025/01/07 10:14:05 by tomlimon         ###   ########.fr        #
+#    Updated: 2025/01/08 16:48:52 by tomlimon         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 
-SRCS = ./src/main.c ./src/utils.c
+SRCS = ./src/main.c ./src/utils.c ./src/time.c
 
 LIBFT_SRCS =
 
