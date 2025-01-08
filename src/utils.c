@@ -6,11 +6,34 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:12:51 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/07 15:14:35 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/08 16:30:59 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../header/philo.h"
+
+void ft_smart_sleep(long long time, t_table *table)
+{
+    long long start;
+    long long now;
+
+    start = get_timestamp(table);
+    while (1)
+    {
+        pthread_mutex_lock(&table->status_mutex);
+        if (!table->simulation_running)
+        {
+            pthread_mutex_unlock(&table->status_mutex);
+            break;
+        }
+        pthread_mutex_unlock(&table->status_mutex);
+
+        now = get_timestamp(table);
+        if ((now - start) >= time)
+            break;
+        usleep(500);
+    }
+}
 
 int ft_atoi(char *str)
 {
@@ -41,13 +64,13 @@ void ft_cleanup(t_table *table)
     i = 0;
     while (i < table->nb_philos)
     {
-        pthread_join(table->philos[i].thread, NULL); // Attendre la fin des threads
+        pthread_join(table->philos[i].thread, NULL);
         i++;
     }
     i = 0;
     while (i < table->nb_philos)
     {
-        pthread_mutex_destroy(&table->forks[i]); // Détruire les mutex
+        pthread_mutex_destroy(&table->forks[i]);
         i++;
     }
     free(table->philos);

@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 08:12:53 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/07 15:15:54 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/08 16:25:21 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int ft_validate_args(char **argv)
     return (0);
 }
 
-int ft_init_philo(t_table *table, int nb, char **argv)
+int ft_init_philo(t_table *table, int nb, char **argv, int argc)
 {
     int i;
 
@@ -40,6 +40,25 @@ int ft_init_philo(t_table *table, int nb, char **argv)
     if (!table->forks)
     {
         perror("Erreur d'allocation pour les fourchettes");
+        return (-1);
+    }
+    if (argc == 6)
+    {
+        table->max_meals = ft_atoi(argv[5]);
+        if (table->max_meals <= 0)
+        {
+            write(1, "invalid max meals\n", 19);
+            return (-1);
+        }
+    }
+    else
+        table->max_meals = -1;
+
+    table->meals_taken = 0;
+
+    if (pthread_mutex_init(&table->meals_mutex, NULL) != 0)
+    {
+        perror("Erreur mutex meals");
         return (-1);
     }
     while (i < nb)
@@ -93,32 +112,58 @@ void *ft_supervisor(void *arg)
 
     while (1)
     {
+        int meals_completed = 1;
+
         for (int i = 0; i < table->nb_philos; i++)
         {
             long long current_time = get_timestamp(table);
             long long time_since_last_meal = current_time -
-                (table->philos[i].last_meal_time - table->start_time);
+                                             (table->philos[i].last_meal_time - table->start_time);
 
             if (time_since_last_meal > table->time_to_die)
             {
                 pthread_mutex_lock(&table->status_mutex);
                 table->simulation_running = 0;
                 pthread_mutex_unlock(&table->status_mutex);
+
                 print_status(table, table->philos[i].id, "died");
                 return NULL;
             }
+
+            if (table->max_meals != -1 && table->philos[i].meals_eaten < table->max_meals)
+                meals_completed = 0;
         }
-        usleep(1000);
+
+        // Arrêter la simulation si tous les repas sont terminés
+        if (table->max_meals != -1 && meals_completed)
+        {
+            pthread_mutex_lock(&table->status_mutex);
+            table->simulation_running = 0;
+            pthread_mutex_unlock(&table->status_mutex);
+            return NULL;
+        }
+
+        usleep(1000); // Vérification toutes les 1 ms
     }
+
     return NULL;
 }
+
 void *ft_philo_routine(void *arg)
 {
     t_philosopher *philo = (t_philosopher *)arg;
     t_table *table = philo->table;
 
     if (philo->id % 2 == 0)
-        usleep(100);
+        usleep(1000);  // Décalage pour les philosophes pairs
+
+    // Cas particulier pour un philosophe unique
+    if (table->nb_philos == 1)
+    {
+        print_status(table, philo->id, "has taken a fork");
+        usleep(table->time_to_die * 1000);
+        return NULL;
+    }
 
     while (1)
     {
@@ -130,22 +175,48 @@ void *ft_philo_routine(void *arg)
         }
         pthread_mutex_unlock(&table->status_mutex);
 
-        pthread_mutex_lock(philo->left_fork);
-        print_status(table, philo->id, "has taken a fork");
-        pthread_mutex_lock(philo->right_fork);
-        print_status(table, philo->id, "has taken a fork");
+        // Prendre les fourchettes
+        if (philo->id % 2 == 0)
+        {
+            pthread_mutex_lock(philo->right_fork);
+            print_status(table, philo->id, "has taken a fork");
+            pthread_mutex_lock(philo->left_fork);
+            print_status(table, philo->id, "has taken a fork");
+        }
+        else
+        {
+            pthread_mutex_lock(philo->left_fork);
+            print_status(table, philo->id, "has taken a fork");
+            pthread_mutex_lock(philo->right_fork);
+            print_status(table, philo->id, "has taken a fork");
+        }
 
-        philo->last_meal_time = ft_get_time();
+        // Manger
+        pthread_mutex_lock(&table->meals_mutex);
+        philo->last_meal_time = get_timestamp(table) + table->start_time;
         print_status(table, philo->id, "is eating");
-        usleep(table->time_to_eat * 1000);
+        if (table->max_meals != -1)
+            philo->meals_eaten++;
+        pthread_mutex_unlock(&table->meals_mutex);
 
-        pthread_mutex_unlock(philo->right_fork);
+        ft_smart_sleep(table->time_to_eat, table);
+
+        // Relâcher les fourchettes
         pthread_mutex_unlock(philo->left_fork);
+        pthread_mutex_unlock(philo->right_fork);
 
         print_status(table, philo->id, "is sleeping");
-        usleep(table->time_to_sleep * 1000);
+        ft_smart_sleep(table->time_to_sleep, table);
 
         print_status(table, philo->id, "is thinking");
+
+        pthread_mutex_lock(&table->status_mutex);
+        if (!table->simulation_running)
+        {
+            pthread_mutex_unlock(&table->status_mutex);
+            break;
+        }
+        pthread_mutex_unlock(&table->status_mutex);
     }
     return NULL;
 }
@@ -174,20 +245,20 @@ int main(int argc, char **argv)
 {
     t_table table;
     pthread_t supervisor_thread;
-    int i;
 
-    i = 0;
-    if (argc < 5)
+    if (argc < 5 || argc > 6)
     {
         write(1, "error argument\n", 16);
         return (-1);
     }
+
     if (ft_validate_args(argv) == -1)
     {
         write(1, "invalid argument\n", 17);
         return (-1);
     }
-    if (ft_init_philo(&table, atoi(argv[1]), argv) == -1)
+
+    if (ft_init_philo(&table, atoi(argv[1]), argv, argc) == -1)
     {
         write(1, "initialization error\n", 22);
         return (-1);
@@ -203,13 +274,10 @@ int main(int argc, char **argv)
 
     pthread_join(supervisor_thread, NULL);
 
-    // Attendre que tous les threads des philosophes terminent, si la simulation est toujours en cours
-    i = 0;
-    while (i < table.nb_philos)
+    // Attendre la fin de tous les threads des philosophes
+    for (int i = 0; i < table.nb_philos; i++)
     {
-        if (table.simulation_running)
-            pthread_join(table.philos[i].thread, NULL);
-        i++;
+        pthread_join(table.philos[i].thread, NULL);
     }
 
     // Libérer les ressources

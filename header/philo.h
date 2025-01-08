@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:07:18 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/07 15:14:46 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/08 16:24:58 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,13 @@ typedef struct s_table
     int                 time_to_die;
     int                 time_to_eat;
     int                 time_to_sleep;
-    pthread_mutex_t     status_mutex;
+    int                 max_meals;
+    int                 meals_taken;
     int                 simulation_running;
-    long long           start_time;
+    pthread_mutex_t     status_mutex;
     pthread_mutex_t     write_mutex;
+    pthread_mutex_t     meals_mutex;
+    long long           start_time;
     t_philosopher       *philos;
     pthread_mutex_t     *forks;
 }   t_table;
@@ -55,5 +58,6 @@ long long ft_get_time(void);
 void print_status(t_table *table, int philo_id, char *message);
 long long get_timestamp(t_table *table);
 int ft_strcmp(const char *s1, const char *s2);
+void ft_smart_sleep(long long time, t_table *table);
 
 #endif
