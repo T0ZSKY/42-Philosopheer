@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 08:12:53 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/07 14:41:14 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/07 15:15:54 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,14 +99,12 @@ void *ft_supervisor(void *arg)
             long long time_since_last_meal = current_time -
                 (table->philos[i].last_meal_time - table->start_time);
 
-            if (time_since_last_meal - table->time_to_eat > table->time_to_die)
+            if (time_since_last_meal > table->time_to_die)
             {
-                pthread_mutex_lock(&table->write_mutex);
                 pthread_mutex_lock(&table->status_mutex);
                 table->simulation_running = 0;
-                printf("%lld %d died\n", current_time, table->philos[i].id);
                 pthread_mutex_unlock(&table->status_mutex);
-                pthread_mutex_unlock(&table->write_mutex);
+                print_status(table, table->philos[i].id, "died");
                 return NULL;
             }
         }

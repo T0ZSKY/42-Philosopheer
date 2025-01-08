@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:07:18 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/07 14:40:25 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/07 15:14:46 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,5 +54,6 @@ void ft_cleanup(t_table *table);
 long long ft_get_time(void);
 void print_status(t_table *table, int philo_id, char *message);
 long long get_timestamp(t_table *table);
+int ft_strcmp(const char *s1, const char *s2);
 
 #endif
