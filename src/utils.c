@@ -3,25 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tomlimon <tomlimon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:12:51 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/09 11:56:05 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/09 14:02:02 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../header/philo.h"
 
-int ft_atoi(char *str)
+int	ft_atoi(char *str)
 {
-	int i;
-	int result;
-	int sign;
+	int	i;
+	int	result;
+	int	sign;
 
 	sign = 1;
 	result = 0;
 	i = 0;
-
 	if (str[i] == '-')
 	{
 		sign = -1;
@@ -34,44 +33,40 @@ int ft_atoi(char *str)
 	}
 	return (result * sign);
 }
-void ft_cleanup(t_table *table)
+
+void	ft_cleanup(t_table *table)
 {
-    int i;
+	int	i;
 
-    i = 0;
-    
-    while (i < table->nb_philos)
-    {
-        pthread_mutex_destroy(&table->forks[i]);
-        i++;
-    }
-
-    pthread_mutex_destroy(&table->status_mutex);
-    pthread_mutex_destroy(&table->meals_mutex);
-    pthread_mutex_destroy(&table->write_mutex);
-
-    free(table->philos);
-    free(table->forks);
+	i = 0;
+	while (i < table->nb_philos)
+	{
+		pthread_mutex_destroy(&table->forks[i]);
+		i++;
+	}
+	pthread_mutex_destroy(&table->status_mutex);
+	pthread_mutex_destroy(&table->meals_mutex);
+	pthread_mutex_destroy(&table->write_mutex);
+	free(table->philos);
+	free(table->forks);
 }
 
-
-void print_status(t_table *table, int philo_id, char *message)
+void	print_status(t_table *table, int philo_id, char *message)
 {
-    pthread_mutex_lock(&table->write_mutex);
-    if (table->simulation_running || ft_strcmp(message, "died") == 0)
-    {
-        printf("%lld %d %s\n", get_timestamp(table), philo_id, message);
-    }
-    pthread_mutex_unlock(&table->write_mutex);
+	pthread_mutex_lock(&table->write_mutex);
+	if (table->simulation_running || ft_strcmp(message, "died") == 0)
+	{
+		printf("%lld %d %s\n", get_timestamp(table), philo_id, message);
+	}
+	pthread_mutex_unlock(&table->write_mutex);
 }
 
-
-int ft_strcmp(const char *s1, const char *s2)
+int	ft_strcmp(const char *s1, const char *s2)
 {
-    size_t i;
+	size_t	i;
 
-    i = 0;
-    while (s1[i] && s2[i] && s1[i] == s2[i])
-        i++;
-    return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+	i = 0;
+	while (s1[i] && s2[i] && s1[i] == s2[i])
+		i++;
+	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
