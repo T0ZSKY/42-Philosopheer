@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
+/*   By: tomlimon <tomlimon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:12:51 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/08 16:48:28 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/09 11:56:05 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,20 +39,21 @@ void ft_cleanup(t_table *table)
     int i;
 
     i = 0;
-    while (i < table->nb_philos)
-    {
-        pthread_join(table->philos[i].thread, NULL);
-        i++;
-    }
-    i = 0;
+    
     while (i < table->nb_philos)
     {
         pthread_mutex_destroy(&table->forks[i]);
         i++;
     }
+
+    pthread_mutex_destroy(&table->status_mutex);
+    pthread_mutex_destroy(&table->meals_mutex);
+    pthread_mutex_destroy(&table->write_mutex);
+
     free(table->philos);
     free(table->forks);
 }
+
 
 void print_status(t_table *table, int philo_id, char *message)
 {

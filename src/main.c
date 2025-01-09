@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
+/*   By: tomlimon <tomlimon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 08:12:53 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/08 16:47:11 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/09 12:13:52 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,7 @@ int ft_init_philo(t_table *table, int nb, char **argv, int argc)
         return (-1);
     }
     i = 0;
+    table->simulation_running = 1;
     while (i < nb)
     {
         table->philos[i].id = i + 1;
@@ -100,7 +101,7 @@ int ft_init_philo(t_table *table, int nb, char **argv, int argc)
         table->philos[i].left_fork = &table->forks[i];
         table->philos[i].right_fork = &table->forks[(i + 1) % nb];
         table->philos[i].table = table;
-        table->simulation_running = 1;
+        pthread_mutex_init(&table->philos[i].mutex, NULL);
         i++;
     }
     return (0);
@@ -117,6 +118,7 @@ void *ft_supervisor(void *arg)
         for (int i = 0; i < table->nb_philos; i++)
         {
             long long current_time = get_timestamp(table);
+            pthread_mutex_lock(&table->philos[i].mutex);
             long long time_since_last_meal = current_time -
                                             (table->philos[i].last_meal_time - table->start_time);
 
@@ -127,8 +129,10 @@ void *ft_supervisor(void *arg)
                 pthread_mutex_unlock(&table->status_mutex);
 
                 print_status(table, table->philos[i].id, "died");
+                pthread_mutex_unlock(&table->philos[i].mutex);
                 return NULL;
             }
+            pthread_mutex_unlock(&table->philos[i].mutex);
 
             if (table->max_meals != -1 && table->philos[i].meals_eaten < table->max_meals)
                 meals_completed = 0;
@@ -147,6 +151,7 @@ void *ft_supervisor(void *arg)
 
     return NULL;
 }
+
 
 void *ft_philo_routine(void *arg)
 {
@@ -190,12 +195,12 @@ void *ft_philo_routine(void *arg)
         }
 
         // Manger
-        pthread_mutex_lock(&table->meals_mutex);
+        pthread_mutex_lock(&philo->mutex);
         philo->last_meal_time = get_timestamp(table) + table->start_time;
         print_status(table, philo->id, "is eating");
         if (table->max_meals != -1)
             philo->meals_eaten++;
-        pthread_mutex_unlock(&table->meals_mutex);
+        pthread_mutex_unlock(&philo->mutex);
 
         ft_smart_sleep(table->time_to_eat, table);
 
@@ -267,6 +272,7 @@ int main(int argc, char **argv)
     if (pthread_create(&supervisor_thread, NULL, ft_supervisor, &table) != 0)
     {
         printf("Erreur création thread superviseur\n");
+        ft_cleanup(&table);
         return (-1);
     }
 
@@ -274,10 +280,12 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < table.nb_philos; i++)
     {
-        pthread_join(table.philos[i].thread, NULL);
+        if (pthread_join(table.philos[i].thread, NULL) != 0)
+        {
+            printf("Erreur lors du join du thread %d\n", i + 1);
+        }
     }
 
-    // Libérer les ressources
     ft_cleanup(&table);
 
     return (0);
