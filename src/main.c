@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 08:12:53 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/10 13:39:04 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/10 16:56:05 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,67 +24,6 @@ int	ft_validate_args(char **argv)
 		i++;
 	}
 	return (0);
-}
-
-void	*ft_philo_routine(void *arg)
-{
-	t_philosopher	*philo;
-	t_table			*table;
-
-	philo = (t_philosopher *)arg;
-	table = philo->table;
-	if (philo->id % 2 == 0)
-		usleep(1000);
-	if (table->nb_philos == 1)
-	{
-		print_status(table, philo->id, "has taken a fork");
-		usleep(table->time_to_die * 1000);
-		return (NULL);
-	}
-	while (1)
-	{
-		pthread_mutex_lock(&table->status_mutex);
-		if (!table->simulation_running)
-		{
-			pthread_mutex_unlock(&table->status_mutex);
-			break ;
-		}
-		pthread_mutex_unlock(&table->status_mutex);
-		if (philo->id % 2 == 0)
-		{
-			pthread_mutex_lock(philo->right_fork);
-			print_status(table, philo->id, "has taken a fork");
-			pthread_mutex_lock(philo->left_fork);
-			print_status(table, philo->id, "has taken a fork");
-		}
-		else
-		{
-			pthread_mutex_lock(philo->left_fork);
-			print_status(table, philo->id, "has taken a fork");
-			pthread_mutex_lock(philo->right_fork);
-			print_status(table, philo->id, "has taken a fork");
-		}
-		pthread_mutex_lock(&philo->mutex);
-		philo->last_meal_time = get_timestamp(table) + table->start_time;
-		print_status(table, philo->id, "is eating");
-		if (table->max_meals != -1)
-			philo->meals_eaten++;
-		pthread_mutex_unlock(&philo->mutex);
-		ft_smart_sleep(table->time_to_eat, table);
-		pthread_mutex_unlock(philo->left_fork);
-		pthread_mutex_unlock(philo->right_fork);
-		print_status(table, philo->id, "is sleeping");
-		ft_smart_sleep(table->time_to_sleep, table);
-		print_status(table, philo->id, "is thinking");
-		pthread_mutex_lock(&table->status_mutex);
-		if (!table->simulation_running)
-		{
-			pthread_mutex_unlock(&table->status_mutex);
-			break ;
-		}
-		pthread_mutex_unlock(&table->status_mutex);
-	}
-	return (NULL);
 }
 
 void	ft_init_thread(t_table *table)
