@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 08:12:53 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/10 16:56:05 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/10 17:18:57 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,8 @@ void	ft_init_thread(t_table *table)
 	}
 }
 
-int	main(int argc, char **argv)
+static int	validate_and_init(t_table *table, int argc, char **argv)
 {
-	t_table		table;
-	pthread_t	supervisor_thread;
-	int			i;
-
 	if (argc < 5 || argc > 6)
 	{
 		write(1, "error argument\n", 16);
@@ -63,26 +59,42 @@ int	main(int argc, char **argv)
 		write(1, "invalid argument\n", 17);
 		return (-1);
 	}
-	if (ft_init_philo(&table, atoi(argv[1]), argv, argc) == -1)
+	if (ft_init_philo(table, atoi(argv[1]), argv, argc) == -1)
 	{
 		write(1, "initialization error\n", 22);
 		return (-1);
 	}
-	ft_init_thread(&table);
-	if (pthread_create(&supervisor_thread, NULL, ft_supervisor, &table) != 0)
+	return (0);
+}
+
+static int	create_threads(t_table *table, pthread_t *supervisor_thread)
+{
+	ft_init_thread(table);
+	if (pthread_create(supervisor_thread, NULL, ft_supervisor, table) != 0)
 	{
 		printf("Erreur création thread superviseur\n");
-		ft_cleanup(&table);
+		ft_cleanup(table);
 		return (-1);
 	}
+	return (0);
+}
+
+int	main(int argc, char **argv)
+{
+	t_table		table;
+	pthread_t	supervisor_thread;
+	int			i;
+
+	if (validate_and_init(&table, argc, argv) == -1)
+		return (-1);
+	if (create_threads(&table, &supervisor_thread) == -1)
+		return (-1);
 	pthread_join(supervisor_thread, NULL);
 	i = 0;
 	while (i < table.nb_philos)
 	{
 		if (pthread_join(table.philos[i].thread, NULL) != 0)
-		{
 			printf("Erreur lors du join du thread %d\n", i + 1);
-		}
 		i++;
 	}
 	ft_cleanup(&table);
