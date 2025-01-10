@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tomlimon <tomlimon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:07:18 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/09 12:04:35 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/09 14:35:53 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,5 +60,6 @@ void print_status(t_table *table, int philo_id, char *message);
 long long get_timestamp(t_table *table);
 int ft_strcmp(const char *s1, const char *s2);
 void ft_smart_sleep(long long time, t_table *table);
+int	ft_init_philo(t_table *table, int nb, char **argv, int argc);
 
 #endif
