@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tomlimon <tomlimon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:07:18 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/10 13:22:56 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/10 13:40:02 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,5 +60,6 @@ long long	get_timestamp(t_table *table);
 int			ft_strcmp(const char *s1, const char *s2);
 void		ft_smart_sleep(long long time, t_table *table);
 int			ft_init_philo(t_table *table, int nb, char **argv, int argc);
+void		*ft_supervisor(void *arg);
 
 #endif
