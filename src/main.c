@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 08:12:53 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/10 17:18:57 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/11 13:48:36 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,11 @@ int	main(int argc, char **argv)
 	pthread_t	supervisor_thread;
 	int			i;
 
+	if (ft_verif(argv, argc) == 1)
+	{
+		printf("Erreur argument\n");
+		return (-1);
+	}
 	if (validate_and_init(&table, argc, argv) == -1)
 		return (-1);
 	if (create_threads(&table, &supervisor_thread) == -1)

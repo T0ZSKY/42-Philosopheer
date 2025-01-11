@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:07:18 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/10 16:56:30 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/11 13:46:07 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,5 +62,6 @@ void		ft_smart_sleep(long long time, t_table *table);
 int			ft_init_philo(t_table *table, int nb, char **argv, int argc);
 void		*ft_supervisor(void *arg);
 void		*ft_philo_routine(void *arg);
+int			ft_verif(char **argv, int argc);
 
 #endif

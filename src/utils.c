@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:12:51 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/11 13:29:01 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/11 13:48:03 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,4 +74,23 @@ int	ft_strcmp(const char *s1, const char *s2)
 	while (s1[i] && s2[i] && s1[i] == s2[i])
 		i++;
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+}
+int ft_verif(char **argv, int argc)
+{
+	int	i;
+	int	j;
+
+	j = 1;
+	while (j < (argc))
+	{
+		i = 0;
+		while (argv[j][i])
+		{
+			if (argv[j][i] > '9' || argv[j][i] < '0')
+				return (1);
+			i++;
+		}
+		j++;
+	}
+	return (0);
 }
