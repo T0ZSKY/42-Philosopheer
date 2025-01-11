@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:12:51 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/09 14:02:02 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/11 13:29:01 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,13 @@ void	ft_cleanup(t_table *table)
 
 void	print_status(t_table *table, int philo_id, char *message)
 {
+	int	sim_running;
+
+	pthread_mutex_lock(&table->status_mutex);
+	sim_running = table->simulation_running;
+	pthread_mutex_unlock(&table->status_mutex);
 	pthread_mutex_lock(&table->write_mutex);
-	if (table->simulation_running || ft_strcmp(message, "died") == 0)
+	if (sim_running || ft_strcmp(message, "died") == 0)
 	{
 		printf("%lld %d %s\n", get_timestamp(table), philo_id, message);
 	}
