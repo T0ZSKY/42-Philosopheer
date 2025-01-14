@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 17:12:51 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/11 13:48:03 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/14 15:34:20 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,8 @@ int	ft_strcmp(const char *s1, const char *s2)
 		i++;
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
-int ft_verif(char **argv, int argc)
+
+int	ft_verif(char **argv, int argc)
 {
 	int	i;
 	int	j;

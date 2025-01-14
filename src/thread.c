@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/09 14:32:27 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/10 13:28:24 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/14 15:30:55 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ static int	init_table_mutexes(t_table *table)
 		|| pthread_mutex_init(&table->status_mutex, NULL) != 0
 		|| pthread_mutex_init(&table->write_mutex, NULL) != 0)
 	{
-		perror("Erreur mutex");
+		printf("Erreur mutex");
 		return (-1);
 	}
 	return (0);
@@ -53,7 +53,7 @@ static int	init_forks(t_table *table, int nb)
 	table->forks = malloc(sizeof(pthread_mutex_t) * nb);
 	if (!table->forks)
 	{
-		perror("Erreur d'allocation pour les fourchettes");
+		printf("Erreur d'allocation pour les fourchettes");
 		return (-1);
 	}
 	i = 0;
@@ -61,7 +61,7 @@ static int	init_forks(t_table *table, int nb)
 	{
 		if (pthread_mutex_init(&table->forks[i], NULL) != 0)
 		{
-			perror("Erreur d'initialisation de mutex pour une fourchette");
+			printf("Erreur d'initialisation de mutex pour une fourchette");
 			return (-1);
 		}
 		i++;
@@ -77,7 +77,7 @@ static int	init_philosophers(t_table *table, int nb)
 	table->philos = malloc(sizeof(t_philosopher) * nb);
 	if (!table->philos)
 	{
-		perror("Erreur d'allocation pour les philosophes");
+		printf("Erreur d'allocation pour les philosophes");
 		free(table->forks);
 		return (-1);
 	}

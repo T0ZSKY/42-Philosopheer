@@ -6,7 +6,7 @@
 /*   By: tomlimon <tom.limon@>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/20 08:12:53 by tomlimon          #+#    #+#             */
-/*   Updated: 2025/01/11 13:48:36 by tomlimon         ###   ########.fr       */
+/*   Updated: 2025/01/14 15:33:53 by tomlimon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	ft_validate_args(char **argv)
 	i = 1;
 	while (argv[i])
 	{
-		if (atoi(argv[i]) <= 0)
+		if (ft_atoi(argv[i]) <= 0)
 			return (-1);
 		i++;
 	}
@@ -29,6 +29,7 @@ int	ft_validate_args(char **argv)
 void	ft_init_thread(t_table *table)
 {
 	int	i;
+	int	j;
 
 	i = 0;
 	while (i < table->nb_philos)
@@ -37,9 +38,14 @@ void	ft_init_thread(t_table *table)
 				NULL, ft_philo_routine, &table->philos[i]) != 0)
 		{
 			printf("Erreur création thread pour le philosophe %d\n", i + 1);
-			while (i > 0)
+			pthread_mutex_lock(&table->status_mutex);
+			table->simulation_running = 0;
+			pthread_mutex_unlock(&table->status_mutex);
+			j = 0;
+			while (j < i)
 			{
-				pthread_cancel(table->philos[--i].thread);
+				pthread_join(table->philos[j].thread, NULL);
+				j++;
 			}
 			return ;
 		}
